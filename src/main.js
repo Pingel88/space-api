@@ -4,7 +4,8 @@ import $ from 'jquery';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/styles.css';
-import EpicEarth from './js/epic-earth.js';
+import EpicEarth from './js/services/epic-earth.js';
+import Pixabay from './js/services/pixabay.js'
 
 function randomImage(length) {
   return Math.floor(Math.random() * length);
@@ -17,15 +18,31 @@ $(document).ready(function() {
     const userDateInput = $('#date-input').val();
     const dateSlash = userDateInput.replace(/-/g, "/");
     (async function() {
-      const response = await EpicEarth.makeEpicApiCall(userDateInput);
-      console.log(response);
-      if (response.length === 0) {
+      const earthResponse = await EpicEarth.makeEpicApiCall(userDateInput);
+      if (earthResponse.length === 0) {
         $('#image').html("<h1>please select another date</h1>");
       } else {
-        const imageNumber = randomImage(response.length);
-        const imageFile = response[imageNumber].image;
+        console.log(earthResponse);
+        const imageNumber = randomImage(earthResponse.length);
+        const imageFile = earthResponse[imageNumber].image;
         $('#image').html(`<img src="https://epic.gsfc.nasa.gov/archive/enhanced/${dateSlash}/png/${imageFile}.png" alt="EPIC Image">`);
       }
+    })();
+  })
+  $('#imageForm').submit(function(event) {
+    event.preventDefault();
+    const userSearchInput = $('#image-input').val();
+    (async function () {
+      const imageResponse = await Pixabay.makePixabayApiCall(userSearchInput);
+      if (imageResponse.total === 0) {
+        $('#pixaImage').html("<p>No results found. Please enter a different input.</p>");
+      } else {
+        const pixaImageNumber = randomImage(imageResponse.hits.length);
+        const pixaImageUrl = imageResponse.hits[pixaImageNumber].largeImageURL;
+        const pixaTags = imageResponse.hits[pixaImageNumber].tags;
+        $('#pixaImage').html(`<img src="${pixaImageUrl}" alt="${pixaTags}">`)
+      }
+      console.log(imageResponse);
     })();
   })
 })

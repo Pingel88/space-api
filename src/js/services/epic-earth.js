@@ -1,7 +1,7 @@
 export default class EpicEarth {
   static async makeEpicApiCall(userDateInput) {
     try {
-      const response = await fetch(`https://epic.gsfc.nasa.gov/api/enhanced/date/${userDateInput}?api_key=${process.env.API_KEY}`);
+      const response = await fetch(`https://epic.gsfc.nasa.gov/api/enhanced/date/${userDateInput}`);
       if (!response.ok) {
         throw Error(response.statusText);
       }
